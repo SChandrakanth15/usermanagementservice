@@ -3,6 +3,8 @@ package com.theelixrlabs.UserManagementService.controller;
 import com.theelixrlabs.UserManagementService.model.UserModel;
 import com.theelixrlabs.UserManagementService.repository.UserRepository;
 import com.theelixrlabs.UserManagementService.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import java.util.*;
 @RequestMapping("/users")
 @CrossOrigin(origins = "http://127.0.0.1:5500")
 public class UserController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
 
     @Autowired
     private UserService userService;
@@ -24,13 +28,15 @@ public class UserController {
     @Autowired
     private UserRepository userRepository; // Assuming you have a UserRepositor
 
-    // Create or Update User
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody UserModel user) {
         try {
+            logger.info("Registering new user: {}", user.getUsername());
             UserModel savedUser = userService.saveUser(user);
+            logger.info("User '{}' registered successfully.", savedUser.getUsername());
             return ResponseEntity.ok(savedUser);
         } catch (IllegalArgumentException e) {
+            logger.error("Error while registering user: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
@@ -38,31 +44,40 @@ public class UserController {
     // Get all users
     @GetMapping("/all")
     public ResponseEntity<List<UserModel>> getAllUsers() {
+        logger.info("Fetching all users.");
         List<UserModel> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    // New endpoint to get all users except the logged-in user
+    // Get all users except the logged-in user
     @GetMapping("/except")
     public ResponseEntity<List<UserModel>> getAllUsersExcept() {
+        logger.info("Fetching all users except the logged-in user.");
         List<UserModel> users = userService.getAllUsersExcept();
         return ResponseEntity.ok(users);
     }
 
-    // PUT endpoint to update the logged-in user
+    // Update the logged-in user
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestBody UserModel userUpdates) {
         try {
+            logger.info("Updating the current user.");
             UserModel updatedUser = userService.updateCurrentUser(userUpdates);
+            logger.info("User updated successfully.");
             return ResponseEntity.ok(updatedUser);
         } catch (IllegalArgumentException e) {
+            logger.error("Error updating user: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    // Delete the current user
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteCurrentUser() {
+        logger.info("Deleting the current user.");
         userService.deleteCurrentUser();
-        return ResponseEntity.ok("User deleted successfully."); // Return success message
+        logger.info("User deleted successfully.");
+        return ResponseEntity.ok("User deleted successfully.");
     }
 
 }
