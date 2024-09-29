@@ -25,7 +25,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private String currentToken;
 
     public JwtTokenFilter(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8081").build();
+        this.webClient = webClientBuilder.baseUrl("http://authservice:8081").build();
     }
 
     @Override
