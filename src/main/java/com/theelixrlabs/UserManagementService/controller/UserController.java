@@ -15,7 +15,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = "http://127.0.0.1:5500")
+@CrossOrigin(origins = "https://exr-138-frontend.nicepebble-15cceb5b.southindia.azurecontainerapps.io")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
