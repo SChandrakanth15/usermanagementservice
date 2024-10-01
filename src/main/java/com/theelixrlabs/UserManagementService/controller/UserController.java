@@ -1,5 +1,7 @@
 package com.theelixrlabs.UserManagementService.controller;
 
+import com.theelixrlabs.UserManagementService.constants.ApiPathsConstant;
+import com.theelixrlabs.UserManagementService.constants.UserManagementServiceConstant;
 import com.theelixrlabs.UserManagementService.model.UserModel;
 import com.theelixrlabs.UserManagementService.repository.UserRepository;
 import com.theelixrlabs.UserManagementService.service.UserService;
@@ -14,7 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping(ApiPathsConstant.USERS_BASE_ENDPOINT)
 @CrossOrigin(origins = "https://exr-138-frontend.nicepebble-15cceb5b.southindia.azurecontainerapps.io")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -28,7 +30,7 @@ public class UserController {
     @Autowired
     private UserRepository userRepository; // Assuming you have a UserRepositor
 
-    @PostMapping("/register")
+    @PostMapping(ApiPathsConstant.REGISTER_A_USER_ENDPOINT)
     public ResponseEntity<?> createUser(@RequestBody UserModel user) {
         try {
             logger.info("Registering new user: {}", user.getUsername());
@@ -41,16 +43,16 @@ public class UserController {
         }
     }
 
-    // Get all users
-    @GetMapping("/all")
-    public ResponseEntity<List<UserModel>> getAllUsers() {
-        logger.info("Fetching all users.");
-        List<UserModel> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
+//    // Get all users
+//    @GetMapping("/all")
+//    public ResponseEntity<List<UserModel>> getAllUsers() {
+//        logger.info("Fetching all users.");
+//        List<UserModel> users = userService.getAllUsers();
+//        return ResponseEntity.ok(users);
+//    }
 
     // Get all users except the logged-in user
-    @GetMapping("/except")
+    @GetMapping(ApiPathsConstant.GET_ALL_USERS_EXCEPT_ENDPOINT)
     public ResponseEntity<List<UserModel>> getAllUsersExcept() {
         logger.info("Fetching all users except the logged-in user.");
         List<UserModel> users = userService.getAllUsersExcept();
@@ -58,7 +60,7 @@ public class UserController {
     }
 
     // Update the logged-in user
-    @PutMapping("/update")
+    @PutMapping(ApiPathsConstant.UPDATE_A_USER_ENDPOINT)
     public ResponseEntity<?> updateUser(@RequestBody UserModel userUpdates) {
         try {
             logger.info("Updating the current user.");
@@ -72,12 +74,12 @@ public class UserController {
     }
 
     // Delete the current user
-    @DeleteMapping("/delete")
+    @DeleteMapping(ApiPathsConstant.DELETE_A_USER_ENDPOINT)
     public ResponseEntity<String> deleteCurrentUser() {
         logger.info("Deleting the current user.");
         userService.deleteCurrentUser();
         logger.info("User deleted successfully.");
-        return ResponseEntity.ok("User deleted successfully.");
+        return ResponseEntity.ok(UserManagementServiceConstant.USER_DELETED_SUCCESSFULLY);
     }
 
 }

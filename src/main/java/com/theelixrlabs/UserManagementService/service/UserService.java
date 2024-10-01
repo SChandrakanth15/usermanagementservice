@@ -1,5 +1,6 @@
 package com.theelixrlabs.UserManagementService.service;
 
+import com.theelixrlabs.UserManagementService.constants.UserManagementServiceConstant;
 import com.theelixrlabs.UserManagementService.filter.JwtTokenFilter;
 import com.theelixrlabs.UserManagementService.model.UserModel;
 import com.theelixrlabs.UserManagementService.repository.UserRepository;
@@ -40,7 +41,7 @@ public class UserService implements UserDetailsService {
         // Check if username is unique
         if (userRepository.existsByUsername(user.getUsername())) {
             logger.error("Username '{}' is already taken.", user.getUsername());
-            throw new IllegalArgumentException("Username '" + user.getUsername() + "' is already taken.");
+            throw new IllegalArgumentException(UserManagementServiceConstant.USERNAME + user.getUsername() + UserManagementServiceConstant.IS_ALREADY_TAKEN);
         }
 
         // Encrypt the password
@@ -53,7 +54,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         logger.info("Loading user with username: {}", username);
         UserModel user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException(UserManagementServiceConstant.USER_NOT_FOUND_WITH_USERNAME + username));
 
         logger.debug("User '{}' loaded successfully.", username);
         return new org.springframework.security.core.userdetails.User(
@@ -103,7 +104,7 @@ public class UserService implements UserDetailsService {
         String username = jwtTokenFilter.getCurrentUser();
         logger.info("Updating logged-in user: {}", username);
         UserModel currentUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+                .orElseThrow(() -> new IllegalArgumentException(UserManagementServiceConstant.USER_NOT_FOUND));
 
         // Update fields, or leave them unchanged if not provided
         if (userUpdates.getUsername() != null && !userUpdates.getUsername().isEmpty()) {
@@ -124,9 +125,7 @@ public class UserService implements UserDetailsService {
         String username = jwtTokenFilter.getCurrentUser();
         logger.info("Deleting logged-in user: {}", username);
         UserModel user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
-
-        // Delete the user from the repository
+                .orElseThrow(() -> new IllegalArgumentException(UserManagementServiceConstant.USER_NOT_FOUND));
         userRepository.delete(user);
         logger.info("User '{}' deleted successfully.", username);
     }
