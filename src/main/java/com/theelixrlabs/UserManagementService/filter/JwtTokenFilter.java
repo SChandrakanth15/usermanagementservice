@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -25,9 +26,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private String currentUser;
     @Getter
     private String currentToken;
+    @Value("${auth.baseUrl}")
+    private String authUrl;
 
     public JwtTokenFilter(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("https://exr-138-authservice.nicepebble-15cceb5b.southindia.azurecontainerapps.io").build();
+        this.webClient = webClientBuilder.build();
     }
 
     @Override
@@ -41,7 +44,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             //System.out.println(jwtToken);
             // Call Auth Service to verify the token and get the username
             String username = webClient.post()
-                    .uri("/auth/verify")
+                    .uri(authUrl+"/auth/verify")
                     .header("Authorization", "Bearer " + jwtToken)
                     .retrieve()
                     .bodyToMono(String.class)
