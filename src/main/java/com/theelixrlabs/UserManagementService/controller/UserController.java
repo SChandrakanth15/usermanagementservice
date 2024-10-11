@@ -15,43 +15,24 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 
+
 @RestController
 @RequestMapping(ApiPathsConstant.USERS_BASE_ENDPOINT)
 @CrossOrigin(origins = "https://exr-138-frontend.nicepebble-15cceb5b.southindia.azurecontainerapps.io")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-
     @Autowired
     private UserService userService;
-    @Autowired
-    private WebClient.Builder webClientBuilder; // For WebClient
-
-    @Autowired
-    private UserRepository userRepository; // Assuming you have a UserRepositor
 
     @PostMapping(ApiPathsConstant.REGISTER_A_USER_ENDPOINT)
-    public ResponseEntity<?> createUser(@RequestBody UserModel user) {
-        try {
-            logger.info("Registering new user: {}", user.getUsername());
-            UserModel savedUser = userService.saveUser(user);
-            logger.info("User '{}' registered successfully.", savedUser.getUsername());
-            return ResponseEntity.ok(savedUser);
-        } catch (IllegalArgumentException e) {
-            logger.error("Error while registering user: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<UserModel> createUser(@RequestBody UserModel user) {
+        logger.info("Registering new user: {}", user.getUsername());
+        UserModel savedUser = userService.saveUser(user);
+        logger.info("User '{}' registered successfully.", savedUser.getUsername());
+        return ResponseEntity.ok(savedUser);
     }
 
-//    // Get all users
-//    @GetMapping("/all")
-//    public ResponseEntity<List<UserModel>> getAllUsers() {
-//        logger.info("Fetching all users.");
-//        List<UserModel> users = userService.getAllUsers();
-//        return ResponseEntity.ok(users);
-//    }
-
-    // Get all users except the logged-in user
     @GetMapping(ApiPathsConstant.GET_ALL_USERS_EXCEPT_ENDPOINT)
     public ResponseEntity<List<UserModel>> getAllUsersExcept() {
         logger.info("Fetching all users except the logged-in user.");
@@ -59,21 +40,14 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    // Update the logged-in user
     @PutMapping(ApiPathsConstant.UPDATE_A_USER_ENDPOINT)
-    public ResponseEntity<?> updateUser(@RequestBody UserModel userUpdates) {
-        try {
-            logger.info("Updating the current user.");
-            UserModel updatedUser = userService.updateCurrentUser(userUpdates);
-            logger.info("User updated successfully.");
-            return ResponseEntity.ok(updatedUser);
-        } catch (IllegalArgumentException e) {
-            logger.error("Error updating user: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<UserModel> updateUser(@RequestBody UserModel userUpdates) {
+        logger.info("Updating the current user.");
+        UserModel updatedUser = userService.updateCurrentUser(userUpdates);
+        logger.info("User updated successfully.");
+        return ResponseEntity.ok(updatedUser);
     }
 
-    // Delete the current user
     @DeleteMapping(ApiPathsConstant.DELETE_A_USER_ENDPOINT)
     public ResponseEntity<String> deleteCurrentUser() {
         logger.info("Deleting the current user.");
@@ -81,5 +55,4 @@ public class UserController {
         logger.info("User deleted successfully.");
         return ResponseEntity.ok(UserManagementServiceConstant.USER_DELETED_SUCCESSFULLY);
     }
-
 }
