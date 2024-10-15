@@ -9,6 +9,8 @@ public class UserManagementServiceConstant {
     public static final String USER_NOT_FOUND_WITH_USERNAME = "User not found with username: ";
     public static final String USER_NOT_FOUND = "User not found.";
     public static final String USER_DELETED_SUCCESSFULLY = "User deleted successfully.";
-
+    public static final String USERNAME_IS_REQUIRED = "Username is required.";
+    public static final String PASSWORD_IS_REQUIRED = "Password is required.";
+    public static final String USERNAME_ALPHABETS_ONLY = "Username can only contain alphabets.";
 
 }
