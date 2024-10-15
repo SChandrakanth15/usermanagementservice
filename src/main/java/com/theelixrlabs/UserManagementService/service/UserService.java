@@ -1,6 +1,7 @@
 package com.theelixrlabs.UserManagementService.service;
 
 import com.theelixrlabs.UserManagementService.constants.UserManagementServiceConstant;
+import com.theelixrlabs.UserManagementService.exception.UsernameAlreadyTakenException;
 import com.theelixrlabs.UserManagementService.filter.JwtTokenFilter;
 import com.theelixrlabs.UserManagementService.model.UserModel;
 import com.theelixrlabs.UserManagementService.repository.UserRepository;
@@ -39,7 +40,7 @@ public class UserService implements UserDetailsService {
         // Check if username is unique
         if (userRepository.existsByUsername(user.getUsername())) {
             logger.error("Username '{}' is already taken.", user.getUsername());
-            throw new IllegalArgumentException(UserManagementServiceConstant.USERNAME + user.getUsername() + UserManagementServiceConstant.IS_ALREADY_TAKEN);
+            throw new UsernameAlreadyTakenException(UserManagementServiceConstant.USERNAME + user.getUsername() + UserManagementServiceConstant.IS_ALREADY_TAKEN);
         }
 
         // Encrypt the password
