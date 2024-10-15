@@ -22,12 +22,10 @@ public class UserService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final JwtTokenFilter jwtTokenFilter;
     private final PasswordEncoder passwordEncoder;
-    //   private WebClient.Builder webClientBuilder;
+
     @Autowired
     private UserRepository userRepository;
 
-
-    // Constructor injection of PasswordEncoder
     public UserService(JwtTokenFilter jwtTokenFilter, PasswordEncoder passwordEncoder) {
         this.jwtTokenFilter = jwtTokenFilter;
         this.passwordEncoder = passwordEncoder;
@@ -36,13 +34,10 @@ public class UserService implements UserDetailsService {
     // Create or Update User
     public UserModel saveUser(UserModel user) {
         logger.info("Saving new user with username: {}", user.getUsername());
-        // Check if username is unique
         if (userRepository.existsByUsername(user.getUsername())) {
             logger.error("Username '{}' is already taken.", user.getUsername());
             throw new IllegalArgumentException(UserManagementServiceConstant.USERNAME + user.getUsername() + UserManagementServiceConstant.IS_ALREADY_TAKEN);
         }
-
-        // Encrypt the password
         user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt password
         user.setId(UUID.randomUUID());
         return userRepository.save(user);
@@ -92,19 +87,18 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserModel> getAllUsersExcept() {
-        String username = jwtTokenFilter.getCurrentUser();
+        String currentUser = jwtTokenFilter.getCurrentUser(); // Changed to get current user
         List<UserModel> allUsers = userRepository.findAll();
-        allUsers.removeIf(user -> user.getUsername().equals(username)); // Remove the logged-in user
+        allUsers.removeIf(user -> user.getUsername().equals(currentUser)); // Remove the logged-in user
         return allUsers;
     }
 
     public UserModel updateCurrentUser(UserModel userUpdates) {
-        String username = jwtTokenFilter.getCurrentUser();
+        String username = jwtTokenFilter.getCurrentUser(); // Changed to get current user
         logger.info("Updating logged-in user: {}", username);
         UserModel currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException(UserManagementServiceConstant.USER_NOT_FOUND));
 
-        // Update fields, or leave them unchanged if not provided
         if (userUpdates.getUsername() != null && !userUpdates.getUsername().isEmpty()) {
             logger.info("Updating username to: {}", userUpdates.getUsername());
             currentUser.setUsername(userUpdates.getUsername());
@@ -115,19 +109,15 @@ public class UserService implements UserDetailsService {
             currentUser.setPassword(passwordEncoder.encode(userUpdates.getPassword()));
         }
 
-        // Save the updated user back to the database
         return userRepository.save(currentUser);
     }
 
     public void deleteCurrentUser() {
-        String username = jwtTokenFilter.getCurrentUser();
+        String username = jwtTokenFilter.getCurrentUser(); // Changed to get current user
         logger.info("Deleting logged-in user: {}", username);
         UserModel user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException(UserManagementServiceConstant.USER_NOT_FOUND));
         userRepository.delete(user);
         logger.info("User '{}' deleted successfully.", username);
     }
-
 }
-
-
